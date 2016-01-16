@@ -20,7 +20,11 @@ namespace MonitorDarkener
 
         #region CTOR & LOAD
         public Form1() { InitializeComponent(); }
-        private void MainFormLoad(object sender, EventArgs e) { CheckDisplayCount(); }
+        private void MainFormLoad(object sender, EventArgs e)
+        {
+            CheckDisplayCount();
+            timer.Start();
+        }
         #endregion
 
         private void CheckDisplayCount()
@@ -46,15 +50,14 @@ namespace MonitorDarkener
 
             foreach (Screen s in screens)
             {
-                if (!s.Primary)
+                //New button, set name to display to easier keep track of what button
+                //belongs to what display. Also disable Tab Stop, because we don't calculate where
+                //the button is relative to the others (pressing tab won't move selection in a logical manner).
+                if (s != primary)
                 {
-                    //New button, set name to display to easier keep track of what button
-                    //belongs to what display. Also disable Tab Stop, because we don't calculate where
-                    //the button is relative to the others (pressing tab won't move selection in a logical manner).
                     Button newButton = new Button();
                     newButton.Name = string.Format("{0}_{1}", "Button", s.DeviceName);
                     newButton.TabStop = false;
-
                     bool isRight;
                     bool isDown;
                     Rectangle screenBounds = s.Bounds;
@@ -83,7 +86,7 @@ namespace MonitorDarkener
 
                     //Change button text to something somewhat logical.
                     string buttonText;
-                    buttonText = string.Format("Screen: {2}{0} {1}", (int)offsetRightAmount, (int)offsetDownAmount, Environment.NewLine);
+                    buttonText = string.Format("{0}", s.DeviceName.Trim('.', '\\'));
                     newButton.Text = buttonText;
 
                     //Move button on to the one displaying Primary.
@@ -107,6 +110,10 @@ namespace MonitorDarkener
 
                     newButton.Click += new System.EventHandler(DarkenScreen);
                     this.buttonPanel.Controls.Add(newButton);
+                }
+                else
+                {
+                    primaryDisplay.Name = string.Format("{0}_{1}", "Button", s.DeviceName);
                 }
             }
         }
@@ -138,12 +145,10 @@ namespace MonitorDarkener
                     {
                         DarkForm newDarkForm = new DarkForm();
                         newDarkForm.Show();
-
-                        newDarkForm.Location = new Point(s.Bounds.X, s.Bounds.Y);
-                        newDarkForm.Size = new Size(s.Bounds.Width, s.Bounds.Height);
+                        newDarkForm.Bounds = s.Bounds;
                         newDarkForm.Name = "Form_" + button.Name.Replace("Button_", "");
 
-                        newDarkForm.Opacity = transparencySlider.Value / 100f;
+                        newDarkForm.Opacity = 0;
                         newDarkForm.FormClosing += new FormClosingEventHandler(DarkFormClosed);
 
                         SetButtonState(true, button);
@@ -204,14 +209,39 @@ namespace MonitorDarkener
         private void transparencyChanged(object sender, EventArgs e)
         {
             transparencyValueLabel.Text = string.Format("{0}%", transparencySlider.Value);
-            foreach (DarkForm f in Application.OpenForms.OfType<DarkForm>().ToList())
-                f.Opacity = (transparencySlider.Value / 100f);
+        }
+
+        private double TransparencyValue
+        {
+            get { return 1 - Math.Pow((transparencySlider.Value / 100f), Math.E); }
+        }
+
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            foreach (DarkForm f in Application.OpenForms.OfType<DarkForm>())
+            {
+                if (Rectangle.Intersect(f.Bounds, new Rectangle(MousePosition, new Size(1, 1))) != Rectangle.Empty)
+                {
+                    f.Opacity = Clamp(f.Opacity - (double)timer.Interval / 1000d * 9d, 0d, TransparencyValue);
+                }
+                else
+                {
+                    f.Opacity = Clamp(f.Opacity + (double)timer.Interval / 1000d * 9d, 0d, TransparencyValue);
+                }
+            }
         }
 
         #region One line methods. (Usually an event that simply invokes a method)
         private void resetButton_Click(object sender, EventArgs e) { ResetDarkScreens(); }
         private void refreshDisplaysToolStripMenuItem_Click(object sender, EventArgs e) { CheckDisplayCount(); }
         private void quitToolStripMenuItem_Click(object sender, EventArgs e) { this.Close(); }
+        public int Clamp(int value, int min, int max) { return value >= max ? max : value <= min ? min : value; }
+        public float Clamp(float value, float min, float max) { return value >= max ? max : value <= min ? min : value; }
+        public double Clamp(double value, double min, double max)
+        {
+            return value >= max ? max : value <= min ? min : value;
+        }
         #endregion
     }
 }

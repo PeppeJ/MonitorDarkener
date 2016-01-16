@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.buttonPanel = new System.Windows.Forms.Panel();
             this.primaryDisplay = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -39,6 +40,7 @@
             this.refreshDisplaysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.transparencyValueLabel = new System.Windows.Forms.Label();
+            this.timer = new System.Windows.Forms.Timer(this.components);
             this.buttonPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.transparencySlider)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -57,7 +59,6 @@
             // primaryDisplay
             // 
             this.primaryDisplay.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.primaryDisplay.Enabled = false;
             this.primaryDisplay.Location = new System.Drawing.Point(194, 102);
             this.primaryDisplay.MinimumSize = new System.Drawing.Size(75, 75);
             this.primaryDisplay.Name = "primaryDisplay";
@@ -65,25 +66,24 @@
             this.primaryDisplay.TabIndex = 0;
             this.primaryDisplay.TabStop = false;
             this.primaryDisplay.Text = "Primary Screen";
+            this.primaryDisplay.Click += new System.EventHandler(this.DarkenScreen);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 349);
+            this.label2.Location = new System.Drawing.Point(22, 349);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(72, 13);
+            this.label2.Size = new System.Drawing.Size(75, 13);
             this.label2.TabIndex = 3;
-            this.label2.Text = "Transparency";
+            this.label2.Text = "Transparency:";
             // 
             // transparencySlider
             // 
             this.transparencySlider.Location = new System.Drawing.Point(12, 365);
             this.transparencySlider.Maximum = 100;
             this.transparencySlider.Name = "transparencySlider";
-            this.transparencySlider.Size = new System.Drawing.Size(104, 45);
+            this.transparencySlider.Size = new System.Drawing.Size(125, 45);
             this.transparencySlider.TabIndex = 2;
-            this.transparencySlider.Value = 100;
-            this.transparencySlider.Scroll += new System.EventHandler(this.transparencyChanged);
             this.transparencySlider.ValueChanged += new System.EventHandler(this.transparencyChanged);
             // 
             // resetButton
@@ -143,11 +143,17 @@
             // transparencyValueLabel
             // 
             this.transparencyValueLabel.AutoSize = true;
-            this.transparencyValueLabel.Location = new System.Drawing.Point(83, 349);
+            this.transparencyValueLabel.Location = new System.Drawing.Point(103, 349);
             this.transparencyValueLabel.Name = "transparencyValueLabel";
-            this.transparencyValueLabel.Size = new System.Drawing.Size(33, 13);
+            this.transparencyValueLabel.Size = new System.Drawing.Size(21, 13);
             this.transparencyValueLabel.TabIndex = 4;
-            this.transparencyValueLabel.Text = "100%";
+            this.transparencyValueLabel.Text = "0%";
+            this.transparencyValueLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // timer
+            // 
+            this.timer.Interval = 10;
+            this.timer.Tick += new System.EventHandler(this.timer_Tick);
             // 
             // Form1
             // 
@@ -165,6 +171,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.Name = "Form1";
+            this.ShowIcon = false;
             this.Text = "Monitor Darkener";
             this.Load += new System.EventHandler(this.MainFormLoad);
             this.buttonPanel.ResumeLayout(false);
@@ -189,6 +196,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TrackBar transparencySlider;
         private System.Windows.Forms.Label transparencyValueLabel;
+        private System.Windows.Forms.Timer timer;
     }
 }
 
