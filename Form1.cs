@@ -144,6 +144,7 @@ namespace MonitorDarkener
                         newDarkForm.Name = "Form_" + button.Name.Replace("Button_", "");
 
                         newDarkForm.Opacity = transparencySlider.Value / 100f;
+                        newDarkForm.FormClosing += new FormClosingEventHandler(DarkFormClosed);
 
                         SetButtonState(true, button);
                         break;
@@ -162,22 +163,25 @@ namespace MonitorDarkener
             }
         }
 
+        private void DarkFormClosed(object sender, EventArgs e)
+        {
+            DarkForm form = (DarkForm)sender;
+            foreach (Button b in buttonPanel.Controls.OfType<Button>().ToList())
+                if (b.Name == "Button_" + form.Name.Replace("Form_", ""))
+                    SetButtonState(false, b);
+        }
+
         /// <summary>
         /// Resets the buttons, and removes any dark screens currently visible.
         /// </summary>
         private void ResetDarkScreens()
         {
             foreach (DarkForm d in Application.OpenForms.OfType<DarkForm>().ToList())
-            {
                 d.Close();
-            }
+
             foreach (Button b in buttonPanel.Controls)
-            {
                 if (b.Name != primaryDisplay.Name)
-                {
                     SetButtonState(false, b);
-                }
-            }
         }
 
         /// <summary>
@@ -188,9 +192,7 @@ namespace MonitorDarkener
         private void SetButtonState(bool clicked, Button button)
         {
             if (clicked)
-            {
                 button.BackColor = SystemColors.ControlDark;
-            }
             else
             {
                 button.BackColor = SystemColors.Control;
@@ -203,9 +205,7 @@ namespace MonitorDarkener
         {
             transparencyValueLabel.Text = string.Format("{0}%", transparencySlider.Value);
             foreach (DarkForm f in Application.OpenForms.OfType<DarkForm>().ToList())
-            {
                 f.Opacity = (transparencySlider.Value / 100f);
-            }
         }
 
         #region One line methods. (Usually an event that simply invokes a method)
