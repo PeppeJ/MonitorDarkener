@@ -63,6 +63,7 @@
             this.primaryDisplay.Name = "primaryDisplay";
             this.primaryDisplay.Size = new System.Drawing.Size(75, 75);
             this.primaryDisplay.TabIndex = 0;
+            this.primaryDisplay.TabStop = false;
             this.primaryDisplay.Text = "Primary Screen";
             // 
             // label2
